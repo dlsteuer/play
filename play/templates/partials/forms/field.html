@@ -1,0 +1,15 @@
+{% load widget_tweaks %}
+
+<div class="form-group">
+  {% if label %}
+  <label>{{ label }}</label>
+  {% else %}
+  <label>{{ field.label_tag }}</label>
+  {% endif %}
+  {% render_field field class="form-control" placeholder=placeholder %}
+  {% for error in field.errors %}
+  <div class="text-danger">
+    <small>{{ error }}</small>
+  </div>
+  {% endfor %}
+</div>

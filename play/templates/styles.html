@@ -1,0 +1,115 @@
+<style>
+  /* increase theme's paragraph font-size and make it dark! */
+  p {
+    font-size: 1rem;
+    color: #343a40;
+  }
+  #homepage-steps.timeline .timeline-list:after {
+    top: 17px;
+  }
+  /**
+   * Different color logo for the sign in form.
+  */
+  .sign-in-form .battlesnake-logo {
+    fill: #6f42c1;
+  }
+
+  /* Navbar text menu items */
+  .header-top .top-toolbar-wrapper .top-toolbar ul li>a {
+    color: #fff;
+    padding: 5px 10px;
+  }
+
+  @media (max-width: 991.98px) {
+    .header-top .top-toolbar-wrapper .top-toolbar ul li>a {
+      color: #788db4;
+      font-size: 1.125rem;
+    }
+  }
+  /* Navbar site logo tweaks */
+  .navbar-site-logo {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+  }
+
+  @media (min-width: 992px) {
+    .navbar-site-logo {
+      justify-content: start;
+    }
+  }
+
+  /**
+   * Hack for modals inside list-group-items
+   * https://github.com/twbs/bootstrap/issues/25206
+   */
+  .list-group-item,
+  .list-group-item:hover {
+    z-index: auto !important;
+  }
+
+  /* Fix for theme btn CSS*/
+  a:link.btn.btn-sm {
+    line-height: 1.6;
+  }
+
+  /* Fix for popover widths being too restrictive in the theme */
+  .popover {
+    min-width: 280px;
+    max-width: 400px;
+  }
+
+  /**
+   * SVG logo
+   */
+
+  .logo a {
+    display: block;
+  }
+
+  .battlesnake-logo {
+    fill: #fff;
+    width: 100px;
+  }
+
+  @media (min-width: 992px) {
+    .battlesnake-logo {
+      width: 140px;
+    }
+  }
+
+  .sign-in-form .battlesnake-logo {
+    width: 240px;
+  }
+
+  /**
+   * Homepage tournament media banner
+   */
+  .tournament-media-play-link {
+    height: 140px;
+  }
+
+  @media (min-width: 576px) {
+    .tournament-media-play-link {
+      height: 200px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .tournament-media-play-link {
+      height: 300px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .tournament-media-play-link {
+      height: 140px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .tournament-media-play-link {
+      height: 200px;
+    }
+  }
+</style>

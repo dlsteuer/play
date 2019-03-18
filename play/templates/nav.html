@@ -1,0 +1,194 @@
+<div class="header-wrapper">
+  <div class="header-top">
+    <!-- START MOBILE MENU TRIGGER -->
+    <ul class="mobile-only navbar-nav nav-left">
+      <li class="nav-item">
+        <a href="#" data-toggle-state="aside-left-open">
+          <i class="icon dripicons-align-left"></i>
+        </a>
+      </li>
+    </ul>
+    <!-- END MOBILE MENU TRIGGER -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-lg-6">
+          <!-- START LOGO -->
+          <div class="navbar-site-logo">
+            <a href="{% url 'home' %}" title="Battlesnake">
+              {% include 'battlesnake-logo.html' %}
+            </a>
+          </div>
+          <!-- END LOGO -->
+        </div>
+        <div class="col-lg-6">
+          <!-- START TOP TOOLBAR WRAPPER -->
+          <div class="top-toolbar-wrapper">
+            <nav class="top-toolbar navbar flex-nowrap">
+              <ul class="navbar-nav nav-right">
+                <li class="nav-item dropdown">
+                  <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true"
+                    aria-expanded="false">
+                    About
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{% url 'mission' %}">Our Mission</a>
+                    <a class="dropdown-item" href="{% url 'conduct' %}">Code of Conduct</a>
+                    <a class="dropdown-item" href="{% url 'diversity' %}">Diversity</a>
+                    <a class="dropdown-item" href="{% url 'faq' %}">FAQ</a>
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'blog' %}">
+                    Blog
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'docs' %}">
+                    Docs
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'events' %}">
+                    Events
+                  </a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown dropdown-menu-lg">
+                  <a class="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button"
+                    aria-haspopup="true" aria-expanded="false">
+                    <img src="https://github.com/{{ user.username }}.png?size=64" class="w-35 rounded-circle"
+                      alt="{{ user.username }}">
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right dropdown-menu-accout">
+                    <div class="dropdown-header pb-3">
+                      <a href="{% url 'u' username=user.username %}">
+                        <div class="media d-user">
+                          <img src="https://github.com/{{ user.username }}.png?size=64"
+                            class="align-self-center mr-3 w-40 rounded-circle" alt="{{ user.username }}">
+                          <div class="media-body">
+                            <h5 class="mt-0 mb-0 text-dark">{{ user.username }}</h5>
+                            <span>{{ user.email }}</span>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <a class="dropdown-item" href="{% url 'u' username=user.username %}">
+                      <i class="icon dripicons-user"></i>
+                      Your Profile
+                    </a>
+                    <a class="dropdown-item" href="{% url 'settings' %}">
+                      <i class="icon dripicons-gear"></i>
+                      Account Settings
+                    </a>
+                    <a class="dropdown-item" href="{% url 'help' %}">
+                      <i class="icon dripicons-question"></i>
+                      Get Help
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#report-modal" data-toggle="modal" data-target="#report-modal" class="dropdown-item">
+                      <i class="icon dripicons-flag"></i>
+                      Report Abuse
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'logout' %}">
+                      <i class="icon dripicons-power"></i>
+                      Sign Out
+                    </a>
+                  </div>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                  <a href="{% url 'login' %}" class="nav-link">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'login' %}" class="nav-link">Login</a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+          <!-- END TOP TOOLBAR WRAPPER -->
+        </div>
+      </div>
+    </div>
+    <!-- START MOBILE TOOLBAR TRIGGER -->
+    <ul class="mobile-only navbar-nav nav-right">
+      <li class="nav-item">
+        <a href="#" data-toggle-state="mobile-topbar-toggle">
+          <i class="icon dripicons-dots-3 rotate-90"></i>
+        </a>
+      </li>
+    </ul>
+    <!-- END MOBILE TOOLBAR TRIGGER -->
+  </div>
+  <!-- START HEADER BOTTOM -->
+  <div class="header-bottom">
+    <div class="container-fluid">
+      <!-- START MAIN MENU -->
+      <nav class="main-menu">
+        <ul class="nav metismenu">
+          <li class="sidebar-header mobile-only"><span>NAVIGATION</span></li>
+          <li>
+            <a href="{% url 'home' %}">
+              <i class="icon dripicons-home"></i><span class="hide-menu">Home</span>
+            </a>
+          </li>
+          {% if not request.user.is_anonymous %}
+          <li>
+            <a href="{% url 'u' username=user.username %}">
+              <i class="icon dripicons-view-apps"></i><span class="hide-menu">My Snakes</span>
+            </a>
+          </li>
+          {% endif %}
+          <li>
+            <a href="{% url 'new_game' %}">
+              <i class="icon dripicons-media-play"></i><span class="hide-menu">Create Game</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'leaderboard' %}">
+              <i class="icon dripicons-trophy"></i><span class="hide-menu">Arena</span>
+            </a>
+          </li>
+          {% if user.is_admin %}
+          <li>
+            <a class="text-danger" href="{% url 'tournaments' %}">
+              <i class="icon dripicons-to-do text-danger"></i><span class="hide-menu">Tournaments</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      <!-- END MAIN MENU -->
+    </div>
+  </div>
+  <!-- END HEADER BOTTOM -->
+</div>
+
+
+<div id="report-modal" class="modal" tabindex="-1" role="dialog">
+  <form method="post" novalidate action="/report/">
+    {% csrf_token %}
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Report Abusive Content</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="report_url" value="{{ request.get_full_path }}">
+          <div class="form-group">
+            <label for="report-content">Description</label>
+            <textarea required name="report_content" class="form-control" id="report-content" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Report</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

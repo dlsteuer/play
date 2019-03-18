@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="page-header">
+  <div class="d-flex align-items-center">
+    <div class="mr-auto">
+      <h1>
+        <a href="{% url 'u' username=snake.profile.username %}">
+          {{ snake.profile.username }}
+        </a> / {{ snake.name }}
+      </h1>
+    </div>
+    {% if snake.profile.user == request.user %}
+    <ul class="actions top-right">
+      <li class="dropdown">
+        <a href="#" class="btn btn-fab" data-toggle="dropdown" aria-expanded="false">
+          <i class="la la-ellipsis-h"></i>
+        </a>
+        <div class="dropdown-menu dropdown-icon-menu dropdown-menu-right">
+          <div class="dropdown-header">
+            Menu
+          </div>
+          {% if snake.profile.user == request.user %}
+          <a href="{% url 'snake_edit' snake_id=snake.id %}"
+            class="dropdown-item">
+            Edit Snake
+          </a>
+          {% endif %}
+          {% if snake.profile.user == request.user %}
+          <a href="#delete-modal"
+            class="dropdown-item"
+            data-toggle="modal"
+            data-target="#delete-modal">
+            Delete
+          </a>
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+    {% endif %}
+  </div>
+</header>
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group list-group-flush sidenav">
+      <a href="#games" class="list-group-item active">Latest Games</a>
+    </div>
+  </div>
+  <div class="col">
+    <div id="games" class="info-section">
+      <div class="card">
+        <div class="card-header">
+          {% if snake.is_public or snake.profile.user == request.user %}
+          <div class="pull-right">
+            <a class="btn btn-primary btn-sm" href="{% url 'new_game' %}?snake-ids={{ snake.id }}">Play Game</a>
+          </div>
+          {% endif %}
+          <h2>Latest Games</h2>
+        </div>
+        {% include "core/partials/_games.html" with games=games %}
+      </div>
+    </div>
+    <div id="badges" class="hide info-section">
+      <h2>Badges</h2>
+    </div>
+  </div>
+</div>
+
+<div id="delete-modal" class="modal" tabindex="-1" role="dialog">
+  <form method="post" novalidate action="/s/{{ snake.id }}/">
+    {% csrf_token %}
+    <input type="hidden" name="_method" value="DELETE">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete {{ snake.name }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            This will delete {{ snake.name }} permanently, are you sure you want to do this?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block js_dom_ready %}
+  $(".sidenav a").on('click', function() {
+    $(".sidenav a").removeClass("active")
+    $(this).addClass("active")
+    section = $(this).attr("href")
+    showSection(section)
+  })
+
+  function showSection(section) {
+    $(".info-section").addClass("hide")
+    $(section).removeClass("hide")
+  }
+
+  if (window.location.hash) {
+    showSection(window.location.hash)
+    $(".sidenav a").removeClass("active").each(function(i, a) {
+      if ($(a).attr("href") == window.location.hash) {
+        $(this).addClass("active")
+      }
+    })
+  }
+{% endblock %}

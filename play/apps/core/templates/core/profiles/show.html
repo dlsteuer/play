@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="profile-card text-center">
+          <div class="thumb-xl member-thumb m-b-10 center-block">
+            {% if profile.username == 'battlesnake' %}
+            <img src="{% static 'img/battlesnake-thumb.png' %}"
+              class="rounded-circle img-thumbnail"
+              alt="profile-image" />
+            {% else %}
+            <img src="https://github.com/{{ profile.username }}.png?size=150"
+              class="rounded-circle img-thumbnail"
+              alt="profile-image" />
+            {% endif %}
+          </div>
+
+          <h5>{{ profile.username }}</h5>
+
+          <ul class="list-unstyled">
+            <li>
+              <i class="la la-github"></i>
+              {% if profile.username == 'battlesnake' %}
+              <a target="_blank" href="https://github.com/battlesnakeio/community">GitHub</a>
+              {% else %}
+              <a target="_blank" href="https://github.com/{{ profile.username }}">GitHub</a>
+              {% endif %}
+            </li>
+          </ul>
+
+          {% if profile.user == user %}
+            <hr />
+            <a class="btn btn-secondary btn-block" href="{% url 'settings' %}">Edit</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        {% if profile.user == user %}
+        <a class="btn btn-primary pull-right" href="{% url 'new_snake' %}">Add a Snake</a>
+        {% endif %}
+        <h2>Snakes</h2>
+      </div>
+      {% include "core/partials/_snakes.html" with snakes=profile.snakes %}
+    </div>
+    <div class="card">
+      <div class="card-header">
+        {% if profile.user == user %}
+        <a class="btn btn-primary pull-right" href="{% url 'new_game' %}">Start a Game</a>
+        {% endif %}
+        <h2>Games</h2>
+      </div>
+      {% include "core/partials/_games.html" with games=games %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_dom_ready %}
+$(document).on('click', '.popover .close', function () {
+  $(this).parents('.popover').popover('dispose')
+})
+
+function validateSnake(snakeUrl, button, callback){
+  var engineUrl = window.__battlesnake.settings.ENGINE_URL
+  $.ajax({
+    async: true,
+    dataType: 'json',
+    url: engineUrl + '/validateSnake?url=' + snakeUrl,
+  })
+  .done(callback)
+  .fail(function(xhr, message, error) {
+    console.error(`Snake validation resposne failed: ${message} ${error}`)
+    changeInfoButtonState(button, 'btn-danger')
+    snakeStatuses[snakeUrl] = status('Could not contact engine to validate snake', 'danger')
+  })
+}
+
+var snakeStatuses = []
+
+$('.js-show-snake-status').on('click', function (event) {
+  event.preventDefault()
+  var $elem = $(this)
+  var snakeUrl = $elem.data('snake-url')
+
+  $('.popover').popover('dispose')
+
+  $elem.popover({
+    placement: 'right',
+    trigger: 'click',
+    title: 'Snake API Validation <button type="button" class="close" aria-label="Close" style="line-height: .6;"><span aria-hidden="true">&times;</span></button>',
+    html: true,
+    content: snakeStatuses[snakeUrl] || status('Snake is currently being validated ...', 'info')
+  })
+  $elem.popover('show')
+})
+
+function status(message, type) {
+  return `<div class="alert alert-${type} text-center">${message}</div>`
+}
+
+function changeInfoButtonState(button, state) {
+  button.removeClass('btn-success')
+  button.removeClass('btn-light')
+  button.removeClass('btn-danger')
+  button.addClass(state)
+}
+
+function updateAllSnakeStatusLabels() {
+  $('.js-show-snake-status').each(function(index,currentSnake){
+    var $elem = $(this)
+    var snakeUrl = $elem.data('snake-url')
+    validateSnake(snakeUrl, $elem, function(data){
+      var hasErrors = false
+
+      var scoreTotal = 0
+      var scorePassedTotal = 0
+      var html = '';
+      for (var key of Object.keys(data)) {
+        var item = data[key]
+        scoreTotal += (item.score.checksPassed + item.score.checksFailed)
+        scorePassedTotal += item.score.checksPassed
+
+        html += '<h3>' + key + '</h3>' +
+          '<p>' +
+          'Status: <span class="badge badge-sm ' + (item.statusCode !== 200 ? 'badge-danger' : 'badge-success') + '">' + item.statusCode + '</span><br />' +
+          'Checks: <span class="badge badge-success badge-sm">' + item.score.checksPassed + ' passed</span>' + (item.score.checksFailed !== 0 ? ' / <span class="badge badge-danger badge-sm">' + item.score.checksFailed + ' failed</span>' : '') + '<br />' +
+          'Message: ' + item.Message +
+          '</p>'
+
+        if (item.Errors.length) {
+          hasErrors = true
+        }
+
+        html += hasErrors ? '<p><ul>' : ''
+        for (var errIndex in item.Errors) {
+          html += '<li class="text-danger">Error: ' + item.Errors[errIndex] + '</li>'
+        }
+        html += hasErrors ? '</ul></p>' : ''
+      }
+
+      if (!hasErrors) {
+        html = status('No errors!', 'success') + html
+      }
+
+      if (scorePassedTotal < scoreTotal) {
+        changeInfoButtonState($elem, 'btn-danger')
+      } else {
+        changeInfoButtonState($elem, 'btn-success')
+      }
+
+      snakeStatuses[snakeUrl] = html
+    });
+  })
+}
+updateAllSnakeStatusLabels();
+setInterval(updateAllSnakeStatusLabels, 5000);
+{% endblock %}
+

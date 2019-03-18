@@ -1,0 +1,28 @@
+{% load widget_tweaks %}
+  <div class="form-group">
+    <label>{{ field.label_tag }}</label>
+
+    {% if form.is_bound %}
+      {% if field.errors %}
+        {% render_field field class="form-control is-invalid" %}
+        {% for error in field.errors %}
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% else %}
+        {% render_field field class="form-control is-valid" autocomplete="off" %}
+      {% endif %}
+    {% else %}
+      {% render_field field class="form-control" autocomplete="off" %}
+    {% endif %}
+    {% if field.field.required %}
+    <div class="invalid-feedback">
+      {{field.label}} is required
+    </div>
+    {% endif %}
+
+    {% if field.help_text %}
+      <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+    {% endif %}
+  </div>

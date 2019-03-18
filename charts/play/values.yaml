@@ -1,0 +1,16 @@
+domain: battlesnake.io
+image:
+  repository: gcr.io/battlesnake-io/play
+  tag: TAG # Must be set at deploy time.
+
+# Workers are django management commands that are executed as single pod
+# deployments. Add a management command below to add a new worker.
+workers:
+  - update_game_status
+  - run_matches
+  - rank_snakes
+  - ping_snakes_only_tournament_snakes
+  - ping_snakes
+
+# If this is set, on the next deployment the db will be automatically migrated.
+autoMigrate: true

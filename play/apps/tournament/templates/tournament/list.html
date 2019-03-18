@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    Tournaments
+    <a class="btn btn-secondary btn-outline pull-right" href="{% url 'new_tournament' %}">Create New Tournament</a>
+  </div>
+  <div class="card-body container">
+    <table class="table">
+      <thead>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Brackets</th>
+        <th></th>
+      </thead>
+      <tbody>
+        {% for t in tournaments %}
+          <tr>
+            <td style="max-width: 200px;">
+              <p>
+                <strong>{{ t.name }}</strong>
+              </p>
+            </td>
+            <td>
+              {{t.date}}
+            </td>
+            <td>
+              {% for b in t.brackets %}
+                <p class="mb-0">
+                  <a href="{% url 'tournament_bracket' bracket_id=b.id %}">{{ b.name }}</a>
+                  <a href="{% url 'edit_tournament_bracket' bracket_id=b.id %}">[Edit]</a>
+                </p>
+              {% empty %}
+                <a href="{% url 'new_tournament_bracket' tournament_id=t.id %}">Create a bracket</a>
+              {% endfor %}
+            </td>
+            <td>
+              <div class="dropdown pull-right">
+                <button type="button"
+                  id="tournamentDropdownMenuButton"
+                  class="btn btn-secondary dropdown-toggle"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+                  Menu
+                </button>
+                <div class="dropdown-menu" aria-labelledby="tournamentDropdownMenuButton">
+                  <a class="dropdown-item" href="{% url 'edit_tournament' tournament_id=t.id %}">Edit</a>
+                  <a class="dropdown-item" href="{% url 'new_tournament_bracket' tournament_id=t.id %}">Create Bracket</a>
+                  <a class="dropdown-item" href="{% url 'current_tournament_game' tournament_id=t.id %}">Watch Casting</a>
+                  <a class="dropdown-item" href="{% url 'tournament_commentator_details' tournament_id=t.id %}">Commentator Info</a>
+                  <a class="dropdown-item" href="{% url 'tournament_teams_list' tournament_id=t.id %}">All Teams</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">
+              <p>
+                No tournaments created, why not make one?
+                <a href="{% url 'new_tournament' %}">Create a tournament!</a>
+              </p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

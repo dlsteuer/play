@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: play-root
+  namespace: default
+  annotations:
+    # Creates a dns entry
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.domain }}.
+    # Defined which ingress controller we want to use when multiple are available
+    kubernetes.io/ingress.class: "nginx"
+    # Redirect all traffic to play and include the path:
+    nginx.ingress.kubernetes.io/server-snippet: "return 302 https://play.{{ .Values.domain }}$request_uri;"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.domain }}
+    secretName: play-root-tls
+  rules:
+  - host: {{ .Values.domain }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: default-backend
+          servicePort: 80
+---
+# Don't use the annotation but rather create the certificate manually, this
+# allows us to specify the ingressClass: nginx.
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: play-root-tls
+  namespace: default
+spec:
+  secretName: play-root-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  acme:
+    config:
+    - domains:
+      - "{{ .Values.domain }}"
+      http01:
+        ingressClass: nginx
+  dnsNames:
+  - "{{ .Values.domain }}"

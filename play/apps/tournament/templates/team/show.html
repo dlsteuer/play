@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    My Team
+    <a href="/team/edit" class="pull-right">
+      Edit
+    </a>
+  </div>
+  <div class="card-body container">
+    <div class="row">
+      <div class="col-md-6">
+        <h3 class="card-title">{{ team.name }}</h3>
+        <p>
+          {{ team.description }}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between mb-3">
+          <h3 class="card-title d-inline-block">Members</h3>
+          <a href="/team/members/new" class="btn btn-primary btn-sm" role="button">Add</a>
+        </div>
+
+        <ul class="list-unstyled">
+          {% for member in members %}
+            <li class="media mb-3">
+              <img
+                src="https://github.com/{{member.user.username}}.png?size=64"
+                alt="{{ member.user.username }} GitHub profile avatar"
+                height="64"
+                width="64"
+                class="mr-3 rounded"
+              />
+              <div class="media-body">
+                <a href="https://github.com/{{member.user.username}}" class="d-inline-block">
+                  <h5>
+                    {{ member.user.username }}
+                  </h5>
+                </a>
+                <button type="submit"
+                  class="btn btn-danger btn-outline float-right btn-sm"
+                  data-toggle="modal"
+                  data-target="#delete_user_modal"
+                  data-id="{{ member.user.id }}"
+                  data-username="{{ member.user.username }}">
+                  Delete
+                </button>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="delete_user_modal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-text"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" class="btn btn-primary">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+{% block js_dom_ready %}
+$('#delete_user_modal').on('show.bs.modal', function (event) {
+  var $button = $(event.relatedTarget)
+  var id = $button.data('id')
+  var username = $button.data('username')
+  var $modal = $(this)
+  $modal.find('.modal-text').text('Are you sure you want to delete ' + username + '?')
+  $modal.find('form').attr('action', '/team/members/' + id + '/')
+})
+{% endblock %}
+

@@ -1,0 +1,21 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    docker pull gcr.io/$PROJECT_ID/play:latest || exit 0
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-t', 'gcr.io/$PROJECT_ID/play:$TAG_NAME',
+    '--cache-from', 'gcr.io/$PROJECT_ID/play:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", "gcr.io/$PROJECT_ID/play:$TAG_NAME"]
+- name: 'gcr.io/$PROJECT_ID/helm'
+  args: ['upgrade', '--wait', '--set', 'image.tag=$TAG_NAME', 'play', './charts/play']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-west1'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=battlesnake-k8s-gke'

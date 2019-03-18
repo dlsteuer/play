@@ -1,0 +1,52 @@
+{% load static %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4 col-lg-2">
+      <h6 class="text-muted">Resources</h6>
+      <ul class="list-unstyled">
+        <li><a class="text-dark" href="{% url 'docs' %}">Docs</a></li>
+        <li><a class="text-dark" href="{% url 'help' %}">Get Help</a></li>
+        <li><a class="text-dark" href="{% url 'docs' %}">Learn</a></li>
+        <li><a class="text-dark" href="{% url 'blog' %}">Blog</a></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class="col-sm-4 col-lg-2">
+      <h6 class="text-muted">Community</h6>
+      <ul class="list-unstyled">
+        <li><a class="text-dark" href="{% url 'events' %}">Events</a></li>
+        <li><a class="text-dark" href="{% url 'github' %}">GitHub</a></li>
+        <li><a class="text-dark" href="{% url 'slack' %}">Slack</a></li>
+        <li><a class="text-dark" href="{% url 'sponsors' %}">Sponsor Info</a></li>
+        <li><a class="text-dark" href="{% url 'twitch' %}">Twitch</a></li>
+        <li><a class="text-dark" href="{% url 'twitter' %}">Twitter</a></li>
+      </ul>
+    </div>
+    <div class="col-sm-4 col-lg-2">
+      <h6 class="text-muted">About</h6>
+      <ul class="list-unstyled">
+        <li><a class="text-dark" href="{% url 'mission' %}">Our Mission</a></li>
+        <li><a class="text-dark" href="{% url 'conduct' %}">Code of Conduct</a></li>
+        <li><a class="text-dark" href="{% url 'diversity' %}">Diversity</a></li>
+      </ul>
+    </div>
+    <div class="offset-lg-1 col-lg-5">
+      <h6 class="text-muted">Battlesnake is proudly sponsored by</h6>
+      <a href="https://www.sendwithus.com" title="sendwithus">
+        <img style="margin-left: -12px" src="{% static 'img/Sendwithus_Logo.png' %}" alt="Sendwithus"
+          width="200px" />
+      </a>
+      <a href="https://github.com" title="GitHub">
+        <img src="{% static 'img/GitHub_Logo.png' %}" alt="GitHub Logo" width="160px" />
+      </a>
+    </div>
+  </div>
+  <div class="row p-t-20">
+    <div class="col d-flex align-items-baseline">
+      <p class="text-muted">Copyright &copy; {% now 'Y' %} Battlesnake Inc.</p>
+      <a class="text-dark text-muted p-l-20" href="{% url 'privacy' %}">Privacy Policy</a>
+      <a class="text-dark p-l-20 text-muted" href="{% url 'terms' %}">Terms of Service</a>
+    </div>
+  </div>
+</div>

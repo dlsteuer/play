@@ -1,0 +1,23 @@
+{% for snake in snakes %}
+<li class="list-group-item d-flex align-items-center justify-content-between">
+  <div>
+    <h4 class="mb-1">
+      <a href="{% url 'snake' snake_id=snake.id %}">
+        {{ snake.name }}
+      </a>
+    </h4>
+  </div>
+  {% if profile.user == user %}
+  <button type="button"
+    class="btn btn-light btn-outline js-show-snake-status pull-right"
+    data-toggle="popover"
+    data-snake-url="{{ snake.url }}">
+    Status
+  </button>
+  {% endif %}
+</li>
+{% empty %}
+<li class="list-group-item">
+  <p>No snakes here yet{% if profile.user == user %} — <a href="https://docs.battlesnake.io">Learn how to make one</a>!{% endif %}</p>
+</li>
+{% endfor %}

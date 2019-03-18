@@ -1,0 +1,39 @@
+
+<div class="card" style="margin-bottom: 10px;">
+  <div class="card-header">
+    Winners
+  </div>
+
+  <div class="card-body container">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-primary">Winners</li>
+            {% for winner in tournament_bracket.winners %}
+              <li class="list-group-item">
+                {{ winner.name }}
+                {% if forloop.counter == 1 or forloop.counter == 2 or forloop.counter == 3 %}
+                <span class="badge {% if forloop.counter == 1 %}badge-primary{% elif forloop.counter == 2 %}badge-secondary{% elif forloop.counter == 3 %}badge-info{% endif %}">
+                  {% if forloop.counter == 1 %}1st{% endif %}
+                  {% if forloop.counter == 2 %}2nd{% endif %}
+                  {% if forloop.counter == 3 %}3rd{% endif %}
+                </span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="col-sm">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-secondary">Runner Ups</li>
+            {% for runner_up in tournament_bracket.runner_ups %}
+              <li class="list-group-item">{{ runner_up.name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

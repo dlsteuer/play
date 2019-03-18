@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <div class="row">
+    <div class="col-lg-6 col-md-12 order-2 m-t-30">
+      <h1 class="m-b-10">Welcome to Battlesnake!</h1>
+      <h5 class="text-primary m-b-15">
+        Build a snake bot and compete with other developers
+      </h5>
+      <div class="card">
+        <div class="card-body">
+          <div id="homepage-steps" class="timeline" >
+            <div class="timeline-list timeline-primary">
+              <div class="timeline-info">
+                <small class="text-primary">Step 1</small>
+                <div class="font-size-16">Write a program to play the game Snake</div>
+              </div>
+            </div>
+            <div class="timeline-list timeline-info" >
+              <div class="timeline-info">
+                <div>
+                  <small class="text-info">Step 2</small>
+                  <div class="font-size-16">Deploy using whatever technology you like</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-list timeline-success" >
+              <div class="timeline-info">
+                <div>
+                  <small class="text-success">Step 3</small>
+                  <div class="font-size-16">Battle other snakes and compete in arenas!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% if not user.is_authenticated %}
+      <div class="col-lg-12 m-t-30 order-3">
+        <h5 class="text-center">Join our growing community of friendly Battlesnake developers</h5>
+        <p class="text-center m-b-20 m-t-20">
+          <a href="{% url 'login' %}" class="btn btn-primary btn-rounded btn-lg text-white">
+            <strong>Sign Up and Start Building</strong>
+          </a>
+        </p>
+      </div>
+    {% endif %}
+    <div class="col-lg-6 order-1 m-t-30">
+      <div class="card text-white">
+        <img class="card-img banner-img" src="{% static 'img/battlesnake_splash.png' %}" style="min-height:140px;" alt="Rad Battlesnake Logo With Background">
+      </div>
+    </div>
+  </div>
+  <header class="page-header m-t-50">
+    <h2>Your new favorite side project</h2>
+    <p class="text-secondary">Build your programming skills by writing AI snake bots using modern, real-world technology and compete to be the last snake slithering.</p>
+  </header>
+  <div class=row>
+    <div class="col-12">
+      <div class="card-deck">
+        <div class="card card-elevate text-center" style="cursor: default;">
+          <div class="card-body">
+            <i class="la la-compass font-size-50 text-primary"></i>
+            <h5 class="card-title m-t-20">Learning</h5>
+            <p class="text-muted">Practice makes perfect! As your snake improves, so will your skills (it's science). </p>
+          </div>
+        </div>
+        <div class="card card-elevate text-center" style="cursor: default;">
+          <div class="card-body">
+            <i class="la la-trophy font-size-50 text-primary"></i>
+            <h5 class="card-title m-t-20">Competition</h5>
+            <p class="text-muted">Challenge our snakes, your friend's snakes, or public snakes for fun and glory!</p>
+          </div>
+        </div>
+        <div class="card card-elevate text-center" style="cursor: default;">
+          <div class="card-body">
+            <i class="la la-group font-size-50 text-primary"></i>
+            <h5 class="card-title  m-t-20">Community</h5>
+            <p class="text-muted">Collaborate and learn with our community of developers and help make Battlesnake fun for everyone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <header class="page-header m-t-50 d-flex align-items-center">
+    <h2 class="m-0">Recent Exciting Games</h2>
+    <a class="btn btn-primary btn-rounded bg-transparent btn-outline text-primary ml-2" href="{% url 'new_game' %}">Create a Game</a>
+  </header>
+  <div class="row">
+    {% for game in games %}
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="embed-responsive embed-responsive-1by1">
+            <iframe
+            src="{{ game.url | safe }}"
+            frameborder="0"
+            scrolling="no"
+            class="embed-responsive-item p-1"></iframe>
+          </div>
+          <div class="card-body text-center">
+            <a href="{% url 'game' engine_id=game.engine_id%}"
+              class="btn btn-primary btn-outline btn-rounded">
+              Watch Game
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="card-body text-center">
+            No games here yet — Why not <a href="{% url 'new_game' %}">create one</a>?
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <header class="d-none m-t-50 d-sm-flex page-header align-items-center">
+    <h2>Give Battlesnake a Try Now</h2>
+  </header>
+  <div class="row d-none d-sm-flex justify-content-center">
+    <div class="col-12">
+      <div class="card bg-primary">
+        <h3 class="card-header text-white">
+        Hit start to run this snake bot - can you help it survive?
+        </h3>
+        <div class="card-body ">
+          <iframe src="https://battlesnake-learn.storage.googleapis.com/index.html" width="100%" height="370px"frameBorder="0"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-3 d-flex flex-column justify-content-top p-3">
+      <h5 class="text-center"><strong>Sign up to create your profile and keep building your snake</strong></h5>
+      <p class="text-center m-t-20">
+        <a href="{% url 'login' %}" class="btn btn-accent btn-rounded btn-lg text-white">
+          <strong>Sign up</strong>
+        </a>
+      </p>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="text-center p-3">
+        <blockquote class="blockquote mb-0">
+          <p class="text-primary font-weight-500">"A tonne of fun! ...so proud that we even got our snake to respond with a 200 to the server."</p>
+        </blockquote>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class=" text-center p-3">
+        <blockquote class="blockquote mb-0">
+          <p class="text-info font-weight-500">"That is pretty much the best logo on the internet"</p>
+        </blockquote>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="text-center p-3">
+        <blockquote class="blockquote mb-0">
+          <p class="text-success font-weight-500">"Battlesnake is still the most fun I’ve ever had at a programming contest, and now you can play it any time, anywhere"</p>
+        </blockquote>
+      </div>
+    </div>
+  </div>
+  <div class="row" id="video">
+    <div class="col-lg-8 offset-lg-2 m-b-50">
+      <header class="m-t-50 page-header">
+        <h2 class="font-size-26">Relive Battlesnake 2019 with the Tournament Livestream on Twitch</h2>
+      </header
+      <div class="card text-white">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe
+            src="https://player.twitch.tv/?autoplay=false&video=v390925734"
+            class="embed-responsive-item"
+            allowfullscreen="true"
+            scrolling="no"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js_dom_ready %}
+$('a[href="#video"]').on('click', function (event) {
+  var target = $($(this).attr('href'))
+  if (target.length) {
+    event.preventDefault()
+    $('html, body').stop().animate({
+      scrollTop: target.offset().top
+    }, 1000)
+  }
+})
+{% endblock %}

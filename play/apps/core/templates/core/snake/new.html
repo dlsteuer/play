@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-group card">
+  <h5 class="card-header">Create Snake</h5>
+  <div class="card-body">
+    <form method="post" novalidate action="">
+      {% csrf_token %}
+      {% include "partials/forms/hidden_fields.html" with form=form %}
+      {% include "partials/forms/field.html" with field=form.name label="Name" %}
+      {% include "partials/forms/field.html" with field=form.url label="URL" %}
+      {% include "partials/forms/checkbox.html" with field=form.is_public label="Allow anyone to add this snake to a game" %}
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

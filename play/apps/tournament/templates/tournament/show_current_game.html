@@ -1,0 +1,82 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" style="height:100%;">
+  <head>
+    <meta charset="UTF-8">
+    <title>Battlesnake</title>
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+    {% include 'styles.html' %}
+    <script src="{% static 'theme/vendor/jquery/dist/jquery.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/domready/1.0.8/ready.min.js" integrity="sha256-z7v8HmIeZylwLaPn0X0Ym8dFyV0vkFVe4BkVW/iuwmQ="
+        crossorigin="anonymous"></script>
+  </head>
+  <body class="d-flex align-items-center" style="height:100%;margin:0;padding:0;overflow-y:hidden;background:#fff!important;">
+    <iframe
+      id="game"
+      frameborder="0"
+      scrolling="yes"
+      margin="0"
+      style="height: 100%; width: 100%;"
+      onload="this.contentWindow.focus()">
+    </iframe>
+    <div id="no_game" class="container">
+      <div class="row">
+        <div class="col">
+          <h1>
+            There are no games running currently. We'll be right back!
+          </h1>
+        </div>
+      </div>
+    </div>
+    <script>
+      domready(function () {
+        var current_url = ""
+        var $iframe = $("#game")
+        var $noGame = $("#no_game")
+        var windowLocationExtras = (window.location.search ? '&' + window.location.search.substring(1) : '')
+
+        $noGame.show()
+        $iframe.hide()
+
+        function watchURL(url) {
+          if (current_url === url) {
+            return false
+          }
+
+          if (url.indexOf('/tree/') !== -1 ) {
+            windowLocationExtras = ''
+          }
+
+          console.log("switching to:", url)
+
+          // already watching
+          if (url !== "") {
+            $noGame.hide()
+            $iframe.show()
+          }
+
+          $iframe.attr('src', url)
+          setTimeout(function () {
+            var iframe = $iframe[0]
+            iframe.contentWindow.focus()
+          }, 100)
+          current_url = url
+          return true
+        }
+
+        function getCurrentWatchingGame() {
+          $.get({
+            url: "{% url 'current_tournament_game' tournament_id=tournament.id %}?json=true" + windowLocationExtras,
+            dataType: 'json',
+            success: function (data) {
+              setTimeout(getCurrentWatchingGame, 1000) // poll every second
+              watchURL(data.tournament.casting_uri)
+            }
+          })
+        }
+
+        getCurrentWatchingGame()
+      })
+    </script>
+  </body>
+</html>

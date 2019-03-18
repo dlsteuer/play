@@ -1,0 +1,60 @@
+{{- define "env" -}}
+- name: ENGINE_URL
+  value: "https://engine.battlesnake.io"
+- name: BOARD_URL
+  value: "https://board.battlesnake.io"
+- name: ENV
+  value: "production"
+- name: BATTLESNAKEIO_DOMAIN
+  value: "play.battlesnake.io"
+- name: POSTGRES_HOST
+  value: "sqlproxy-gcloud-sqlproxy"
+- name: POSTGRES_PORT
+  value: "5432"
+- name: POSTGRES_DB
+  value: "play"
+- name: BATTLESNAKE_TOURNAMENT_DATE
+  value: "2019-03-02"
+- name: POSTGRES_USER
+  valueFrom:
+    secretKeyRef:
+      name: cloudsql-play-db-credentials
+      key: username
+      optional: false
+- name: POSTGRES_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: cloudsql-play-db-credentials
+      key: password
+      optional: false
+- name: SENTRY_KEY
+  valueFrom:
+    secretKeyRef:
+      name: sentry-key
+      key: key
+      optional: false
+- name: SLACK_EVENTS_URL
+  valueFrom:
+    secretKeyRef:
+      name: slack-key
+      key: key
+      optional: false
+- name: BATTLESNAKEIO_GITHUB_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: github-oauth
+      key: id
+      optional: false
+- name: BATTLESNAKEIO_GITHUB_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: github-oauth
+      key: secret
+      optional: false
+- name: BATTLESNAKEIO_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: battlesnake-secret
+      key: secret
+      optional: false
+{{- end -}}

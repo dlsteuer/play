@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+    <h1 class="m-b-25">
+      Admin Stats
+    </h1>
+  </div>
+</div>
+<div class="row">
+	<div class="col-4">
+    <div class="card">
+      <div class="card-body">
+        <h1>
+          Total Users:
+        </h1>
+        <div class="display-4 text-center" id="total_users"></div>
+      </div>
+    </div>
+	</div>
+	<div class="col-4">
+    <div class="card">
+      <div class="card-body">
+        <h1>
+          Total Snakes:
+        </h1>
+        <div class="display-4 text-center" id="total_snakes"></div>
+      </div>
+    </div>
+	</div>
+	<div class="col-4">
+    <div class="card">
+      <div class="card-body">
+        <h1>
+          Total Games:
+        </h1>
+        <div class="display-4 text-center" id="total_games"></div>
+      </div>
+    </div>
+	</div>
+</div>
+{% endblock %}
+
+{% block js_dom_ready %}
+var lastTotalUsers = 0
+var lastTotalSnakes = 0
+var lastTotalGames = 0
+
+var POLL_SECONDS = 10
+
+function getDefaultOptions ($elem) {
+  var normalize = function (v) {
+    return $elem.text(Humanize.intComma(v))
+  }
+  return {
+    update: normalize,
+    complete: normalize
+  }
+}
+
+function setCurrentStats (data) {
+  var $totalUsers = $('#total_users')
+  var $totalSnakes = $('#total_snakes')
+  var $totalGames = $('#total_games')
+
+  lastTotalUsers = data.total_users
+  lastTotalSnakes = data.total_snakes
+  lastTotalGames = data.total_games
+
+  $totalUsers.countUp(
+    Object.assign({}, getDefaultOptions($totalUsers), {
+      start: lastTotalUsers,
+      last: data.total_users
+    })
+  )
+  $totalSnakes.countUp(
+    Object.assign({}, getDefaultOptions($totalSnakes), {
+      start: lastTotalSnakes,
+      last: data.total_snakes
+    })
+  )
+  $totalGames.countUp(
+    Object.assign({}, getDefaultOptions($totalGames), {
+      start: lastTotalGames,
+      last: data.total_games
+    })
+  )
+}
+
+function getCurrentStats () {
+  $.get({
+    url: "{% url 'stats' %}?json=true",
+    dataType: 'json',
+  })
+  .done(function (data) {
+    setCurrentStats(data)
+    setTimeout(getCurrentStats, (POLL_SECONDS * 1000))
+  })
+}
+
+getCurrentStats()
+{% endblock %}

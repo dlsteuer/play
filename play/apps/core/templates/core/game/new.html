@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12 col-lg-7">
+      <div class="form-group card">
+        <h5 class="card-header">Create a Game</h5>
+        <div class="card-body">
+          <form method="post" novalidate action="">
+            <h5 class="text-primary m-b-20 m-t-10">1. Select a Board Size</h5>
+            {% csrf_token %}
+            {% include "partials/forms/hidden_fields.html" with form=form %}
+            {% include "partials/forms/field.html" with field=form.board_size label="Board Size" %}
+            <div class="row">
+              <div class="col">
+                {% include "partials/forms/field.html" with field=form.width label="Width" %}
+              </div>
+              <div class="col">
+                {% include "partials/forms/field.html" with field=form.height label="Height" %}
+              </div>
+            </div>
+            {% include "partials/forms/field.html" with field=form.engine_url label="Engine URL" %}
+            <h5 class="text-primary m-b-20 m-t-20">2. Add Snakes to the Pit</h5>
+            <div id="snakes-alert" class="alert alert-danger alert-outline alert-dismissible fade hide" role="alert">
+              Can't add more than 8 snakes to a game
+            </div>
+            <div class="form-group">
+              <label>Find a Snake</label>
+              <div class="row">
+                <div class="col">
+                  <select type="text"
+                    id="snakes-list"
+                    placeholder="type to search for snakes..."
+                    class="form-control"
+                    autocomplete="off"
+                  data-url="/g/snake-autocomplete/"></select>
+                </div>
+                <div class="col-lg-2 py-2 px-lg-2 py-lg-0">
+                  <button type="button"
+                  id="add-snake-button"
+                  class="btn btn-sm btn-primary btn-block">
+                  Add
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Don't know any snakes?</label>
+              <div class="row">
+                <div class="col-lg-4 py-2 px-lg-3 py-lg-0">
+                  <button type="button"
+                  id="add-random-snake-button"
+                  class="btn btn-sm btn-info btn-block">
+                  Add a Random Snake
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="m-t-20 btn btn-primary">Create Game</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-5">
+      <div class="card">
+        <h5 class="card-header text-primary">Snake Pit</h5>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-borderless">
+              <th id="pit-empty-msg">No snakes added yet!</th>
+              <tbody id="snake-table">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js_dom_ready %}
+
+var $hiddenSnakesField = $('#id_snakes')
+var $snakesAlert = $('#snakes-alert')
+var MAX_SNAKES = 8
+
+$('#snakes-list').autoComplete()
+$('#snakes-list').keypress(function (e) {
+  var code = (e.keyCode ? e.keyCode : e.which);
+  if (code == 13) { // Enter key code
+    addSnakeToForm()
+    return false
+  }
+})
+
+$(document).on('click', '#add-random-snake-button', function() {
+  $.ajax({
+    url: '/g/random-public-snake/?count=1'
+  }).done(function(data) {
+    $.each(data["snakes"], function(_, id) {
+      updateHiddenSnakeIds(id)
+    })
+    updateSnakesTable()
+  })
+})
+
+$(document).on('click', '#add-snake-button', function () {
+  addSnakeToForm()
+})
+
+function getHiddenSnakeIds() {
+  var snakes = $hiddenSnakesField.val()
+  var s = []
+
+  if (snakes.length > 0) {
+    s = snakes.split(',')
+  }
+  return s
+}
+
+function updateHiddenSnakeIds(snakeId) {
+  var existingSnakes = getHiddenSnakeIds()
+  // Don't allow more than 8 snakes in the snakes list
+  if (existingSnakes.length >= MAX_SNAKES) {
+    $snakesAlert.addClass('show')
+    $snakesAlert.removeClass('hide')
+    setTimeout(function() {
+      $snakesAlert.addClass('hide')
+      $snakesAlert.removeClass('show')
+    }, 2000)
+    return
+  }
+  var current = $hiddenSnakesField.val()
+  var fieldValue = !current ? snakeId : current + ',' + snakeId
+  $hiddenSnakesField.val(fieldValue)
+  updateSnakesTable()
+}
+
+function addSnakeToForm() {
+  var snakeId = $('#snakes-list').next().next().val()
+  if (!snakeId) {
+    return
+  }
+
+  updateHiddenSnakeIds(snakeId)
+
+  // This could be triggered by an enter keypress, if so, we need to delay a tad so
+  // the autocomplete code can set the textbox
+  setTimeout(function() {
+    $('#snakes-list').val('').next().next().val('')
+  }, 250)
+}
+
+function updateSnakesTable() {
+  var snakes = getHiddenSnakeIds()
+  // hide empty state message when there are snakes
+  if (snakes.length > 0) {
+    $('#pit-empty-msg').hide() 
+  }
+  // Don't allow more than 8 snakes in the snakes table
+  if (snakes.length > MAX_SNAKES) {
+    return
+  }
+  
+  var table = $('#snake-table')   
+  $.ajax({
+    url: '/g/snake-info/?snakes=' + snakes.toString(),
+  }).done(function (data) {
+    table.empty()
+    $.each(snakes, function (_, snakeId) {
+      $.each(data, function (_, item) {
+        if (item.value != snakeId) {
+          return
+        }
+        table.append(
+          '<tr>' +
+            '<td>' + item.text + '</td>' +
+            '<td class="text-right">' +
+              '<button type="button" ' +
+              'class="btn btn-danger btn-sm remove-snake" data-snake-id=' + item.value + '>' +
+                '<strong>'+
+                  '—' +
+                '</strong>'+                
+              '</button>' +
+            '</td>' +
+          '</tr>'
+        )
+      })
+    })
+  })
+}
+
+$(document).on('click', '.remove-snake', function () {
+  var snakeIdToRemove = $(this).data('snake-id')
+  var snakeIds = $hiddenSnakesField.val().split(',')
+  var snakeIdIndex = snakeIds.indexOf(snakeIdToRemove)
+  snakeIds.splice(snakeIdIndex, 1)
+  $hiddenSnakesField.val(snakeIds)
+  updateSnakesTable()
+})
+
+$('#id_height').parent().hide()
+$('#id_width').parent().hide()
+if (window.location.href.search("[?&]engine_url=") == -1) {
+  $('#id_engine_url').parent().hide()
+}
+
+function changeSizeInputs(disabled) {
+  var $height = $('#id_height')
+  var $width = $('#id_width')
+  if (disabled === true) {
+    $height.parent().hide()
+    $width.parent().hide()
+  } else {
+    $height.parent().show()
+    $width.parent().show()
+  }
+  $width.prop('disabled', disabled)
+  $height.prop('disabled', disabled)
+}
+
+$(document).on('change', '', function (event) {
+  let size = $('#id_board_size').val()
+  if (size === 'custom') {
+    changeSizeInputs(false)
+  } else {
+    changeSizeInputs(true)
+  }
+})
+
+updateSnakesTable()
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+  <div class="embed-responsive embed-responsive-1by1" style="max-height: 800px;">
+    <iframe
+      id="iframe_game"
+      src="{{ url | safe }}"
+      scrolling="no"
+      class="embed-responsive-item p-lg-3">
+    </iframe>
+  </div>
+
+  <div class="card-body">
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <a href="#"
+          class="btn btn-info btn-outline mr-2 d-none js-share-game-at-turn">
+          Share this game
+        </a>
+        <a href="{% url 'game_gif' engine_id=game.engine_id %}"
+          class="btn btn-info btn-outline">
+          View as GIF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer text-center d-none d-sm-block" style="height: 150px;">
+    <h3 id="js-snake-highlighted-name"></h3>
+    <a id="js-snake-highlighted-link" href="#"
+      class="btn btn-info btn-outline d-none">
+      View Profile
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_dom_ready %}
+var shareButtonClass = '.js-share-game-at-turn'
+var gameIframeId = 'iframe_game'
+var pageUrlWithoutQuerystring = window.location.origin + window.location.pathname
+var turnCount = 0
+var clipboard = new ClipboardJS(shareButtonClass)
+var $shareButton = $(shareButtonClass)
+var $gameIframe = $('#' + gameIframeId)
+var snakeName = $('#js-snake-highlighted-name')
+var snakeLink = $('#js-snake-highlighted-link')
+
+var acceptedKeyCodes = [
+  'left',
+  'right',
+  'space',
+  'r',
+]
+
+var isSmallScreen = $(window).width() < 992 // Bootstrap `md` breakpoint
+
+// Set the initial share button text to copy
+$shareButton.attr('data-clipboard-text', pageUrlWithoutQuerystring)
+
+clipboard.on('success', function (event) {
+  if (turnCount === 0) {
+    __battlesnake.setTooltip(
+      event.trigger,
+      'Copied shareable URL to your clipboard!'
+    )
+  } else {
+    __battlesnake.setTooltip(
+      event.trigger,
+      'Copied shareable URL at turn ' + turnCount + ' to your clipboard!'
+    )
+  }
+  __battlesnake.hideTooltip()
+})
+
+$shareButton.on('click', function (e) {
+  e.preventDefault()
+})
+
+// Capture and forward keyboard events to the Board iframe
+var gameIframe = document.getElementById(gameIframeId)
+Mousetrap.bind(acceptedKeyCodes, function(e) {
+  e.preventDefault();
+  if (gameIframe) {
+    gameIframe.contentWindow.postMessage({
+      code: e.code,
+      keyCode: e.keyCode // DEPRECATED: Remove after next Board deploy
+    }, __battlesnake.settings.BOARD_URL)
+  }
+})
+
+window.addEventListener('message', function (e) {
+  if (e.origin !== __battlesnake.settings.BOARD_URL) {
+    return;
+  }
+
+  var msg = e.data;
+
+  if (msg.action === 'SET_CURRENT_FRAME') {
+    if (!isSmallScreen) {
+      turnCount = msg.frame.turn
+      $shareButton.attr('data-clipboard-text', pageUrlWithoutQuerystring + '?turn=' + turnCount)
+    }
+  }
+
+  if (msg.action === 'HIGHLIGHT_SNAKE') {
+    if (msg.id) {
+      snakeName.text(msg.name);
+      snakeLink.attr('href', '/u/by-games-snake/' + msg.id);
+      snakeLink.removeClass('d-none');
+    } else {
+      snakeName.text('');
+      snakeLink.addClass('d-none');
+    }
+  }
+}, false)
+
+
+$gameIframe.on('load', function () {
+  // Use Bootstrap breakpoint
+  if (isSmallScreen) {
+    var iframeSrc = $(this).attr('src')
+    // If we're in a narrow view where the media controls don't display,
+    // simply autoplay the game
+    if (!~iframeSrc.indexOf('autoplay')) {
+      $(this).attr('src', iframeSrc + '&autoplay=true')
+    }
+  }
+
+  $shareButton.removeClass('d-none')
+})
+{% endblock %}

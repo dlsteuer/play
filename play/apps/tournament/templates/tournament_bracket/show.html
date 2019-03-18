@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load basic %}
+
+{% block content %}
+
+{% if tournament_bracket.winners %}
+  {% include "tournament_bracket/_winners_pane.html" %}
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <div class="row">
+      <div class="col">
+        {{ tournament_bracket.name }}
+      </div>
+      <div class="col d-flex justify-content-end">
+        <button type="button"
+          class="btn btn-info btn-outline mr-2"
+          data-clipboard-text="{{ tournament_bracket.tournament.id }}">
+          Copy Tournament ID
+        </button>
+
+        <a href="{% url 'tournament_bracket_update_game_statuses' bracket_id=tournament_bracket.id %}"
+          class="btn btn-secondary btn-outline mr-2 js-update-game-statuses">
+          Update Game Statuses
+        </a>
+
+        <div class="dropdown">
+          <button type="button"
+            id="bracket{{ tournament_bracket.id }}DropdownMenuButton"
+            class="btn btn-secondary dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+            Menu
+          </button>
+          <div class="dropdown-menu" aria-labelledby="bracket{{ tournament_bracket.id }}DropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'edit_tournament_bracket' bracket_id=tournament_bracket.id %}">
+              Edit
+            </a>
+            <a class="dropdown-item" href="{% url 'tournament_bracket_create_next_round' bracket_id=tournament_bracket.id %}">
+              Create Next Round
+            </a>
+            <a class="dropdown-item" href="{% url 'tournament_bracket_csv' bracket_id=tournament_bracket.id %}">
+              Export as CSV
+            </a>
+            <a class="dropdown-item" href="{% url 'cast_tournament_bracket' bracket_id=tournament_bracket.id %}?page=tree">
+              Cast Tree
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      {% for round in tournament_bracket.rounds %}
+        <li class="nav-item">
+          <a href="#round-{{ round.number }}"
+            id="round-{{ round.number }}-tab"
+            class="nav-link {% if forloop.last %}show active{% endif %}"
+            data-toggle="tab"
+            role="tab"
+            aria-controls="home"
+            aria-selected="true">
+            Round {{ round.number }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="tab-content">
+      {% for round in tournament_bracket.rounds %}
+        <div class="tab-pane fade {% if forloop.last %}show active{% endif %}"
+          id="round-{{ round.number }}"
+          role="tabpanel"
+          aria-labelledby="home-tab">
+          <ul class="nav nav-tabs" id="heatTables" role="tablist">
+          {% for heat in round.heats %}
+            <li class="nav-item">
+                <a href="#round-{{ round.number }}-heat-{{ heat.number }}"
+                  class="nav-link {% if forloop.first %}show active{% endif %}"
+                  id="round-{{ round.number }}-heat-{{ heat.number }}-tab"
+                  data-toggle="tab"
+                  role="tab"
+                  aria-controls="home"
+                  aria-selected="true">
+                  Heat {{ heat.number }}
+                </a>
+            </li>
+          {% endfor %}
+          </ul>
+
+          <div class="tab-content" id="heatTabContent">
+          {% for heat in round.heats %}
+            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+              id="round-{{ round.number }}-heat-{{ heat.number }}"
+              role="tabpanel"
+              aria-labelledby="home-tab">
+              <div class="row">
+                <div class="col">
+                  <ul class="list-group">
+                    {% for snake in heat.ordered_snakes %}
+                      <li class="list-group-item">
+                        {{ snake_names|get_item:snake.snake.id }}
+                        {% if snake.first or snake.second or snake.third %}
+                        <span class="badge {% if snake.first %}badge-primary{% elif snake.second %}badge-secondary{% elif snake.third %}badge-info{% endif %}">
+                          {% if snake.first %}1st{% endif %}
+                          {% if snake.second %}2nd{% endif %}
+                          {% if snake.third %}3rd{% endif %}
+                        </span>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <div class="col-8">
+                  <div>
+                    <p>
+                      {% if heat.status == "complete" %}
+                        Heat's Complete
+                      {% else %}
+                        {% if not heat.latest_game or heat.latest_game.status != "complete" %}
+                          <a href="{% url 'tournament_bracket_create_next_round_heat' bracket_id=tournament_bracket.id heat_id=heat.id %}"
+                            class="btn btn-primary btn-outline pull-right js-create-heat-game">
+                            Create Next Game
+                          </a>
+                        {% else %}
+                          Wait for latest game to finish before creating next
+                        {% endif %}
+                      {% endif %}
+                    </p>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Game</th>
+                        <th scope="col">Casting status</th>
+                        <th scope="col">Game status</th>
+                        <th scope="col">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for heat_game in heat.games %}
+                      <tr>
+                        <td>{{ heat_game.number }}</td>
+                        <td>
+                          {% if heat_game.status == 'UW' %}<span class="badge badge-warning">{{heat_game.human_readable_status}}</span>{% endif %}
+                          {% if heat_game.status == 'W' %}<span class="badge badge-success">{{heat_game.human_readable_status}}</span>{% endif %}
+                          {% if heat_game.status == 'WD' %}<span class="badge badge-secondary">{{heat_game.human_readable_status}}</span>{% endif %}
+                        </td>
+                        <td>
+                          {% if heat_game.game.status == 'pending' %}<span class="badge badge-warning">{{heat_game.game.status}}</span>
+                          {% elif heat_game.game.status == 'running' %}<span class="badge badge-info">{{heat_game.game.status}}</span>
+                          {% elif heat_game.game.status == 'error' %}<span class="badge badge-danger">{{heat_game.game.status}}</span>
+                          {% elif heat_game.game.status == 'stopped' %}<span class="badge badge-secondary">{{heat_game.game.status}}</span>
+                          {% elif heat_game.game.status == 'complete' %}
+                            {% if heat_game.winner %}
+                              <span class="badge badge-success">{{heat_game.game.status}}</span>
+                            {% else %}
+                              <span class="badge badge-danger"> tie </span>
+                            {% endif %}
+                          {% else %}<span class="badge badge-warning">{{heat_game.game.status}}</span>{% endif %}
+                        </td>
+                        <td>
+                          <a href="{% url 'tournament_bracket_heat_game' heat_id=heat.id heat_game_number=heat_game.number %}?autoplay=true"
+                            class="btn btn-primary btn-outline btn-sm">
+                            View
+                          </a>
+                          <button type="button"
+                            class="btn btn-primary btn-outline btn-sm js-cast-game"
+                            data-heat-game-id="{{ heat_game.id }}">
+                            Cast
+                          </button>
+                          <button type="button"
+                            class="btn btn-info btn-outline btn-sm"
+                            data-clipboard-text="{{ heat_game.game.engine_id }}">
+                            Copy Engine ID
+                          </button>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          </div>
+        </div>
+      {% empty %}
+        <h4>
+          There are no rounds —
+          <a href="{% url 'tournament_bracket_create_next_round' bracket_id=tournament_bracket.id %}">
+            Create Next Round
+          </a>
+        </h4>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_dom_ready %}
+if (location.hash !== '') {
+  $('a[href="' + location.hash + '"]').tab('show');
+}
+
+$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+  history.pushState(null, null, '#'+$(e.target).attr('href').substr(1));
+});
+
+$(".js-cast-game").on('click', function (e) {
+  var $button = $(this)
+  $.ajax({
+    type: 'post',
+    url: "{% url 'current_tournament_game' tournament_id=tournament_bracket.tournament.id %}",
+    data: { heat_game_id: $button.data('heat-game-id') },
+  }).done(function () {
+    window.location.reload()
+  })
+});
+
+$('.js-update-game-statuses').on('click', function (e) {
+  e.preventDefault()
+  var $btn = $(this)
+  $.ajax({
+    url: $btn.attr('href')
+  }).done(function () {
+    window.location.reload()
+  })
+})
+
+$('.js-create-heat-game').on('click', function (e) {
+  e.preventDefault()
+  var $btn = $(this)
+  $.ajax({
+    url: $btn.attr('href')
+  }).done(function () {
+    window.location.reload()
+  })
+})
+{% endblock %}

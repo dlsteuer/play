@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="page-header">
+  <div class="d-flex align-items-center">
+    <div class="mr-auto">
+      <h1>Account Settings</h1>
+    </div>
+    <ul class="actions top-right">
+      <li class="dropdown">
+        <a href="javascript:void(0)" class="btn btn-fab" data-toggle="dropdown" aria-expanded="false">
+          <i class="la la-ellipsis-h"></i>
+        </a>
+        <div class="dropdown-menu dropdown-icon-menu dropdown-menu-right">
+          <div class="dropdown-header">
+            Menu
+          </div>
+          <a href="#delete-modal" data-toggle="modal" data-target="#delete-modal" class="dropdown-item">
+            <i class="la la-trash"></i> Delete my Account
+          </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</header>
+
+
+{% if show_activation %}
+<div class="alert alert-primary fade show">
+  <p class="lead">
+    Thanks for signing up!
+  </p>
+  <p>
+    Please review and save your account settings before getting started. Don't worry, you can update these at any time.
+  </p>
+</div>
+{% endif %}
+
+<form method="post" action="">
+  {% csrf_token %}
+  <input type="hidden" name="_method" value="PUT">
+
+  <div class="card">
+    <h5 class="card-header">Notifications</h5>
+    <div class="card-body">
+      {% include "partials/forms/hidden_fields.html" with form=form %}
+      {% include "partials/forms/field.html" with field=form.email label="Email Address" %}
+      {% include "partials/forms/checkbox.html" with field=form.optin_marketing label="Send me information about new features and upcoming events" %}
+    </div>
+
+    <div class="card-footer bg-light">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </div>
+</form>
+
+<div id="delete-modal" class="modal" tabindex="-1" role="dialog">
+  <form method="post" novalidate action="">
+    {% csrf_token %}
+    <input type="hidden" name="_method" value="DELETE">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete my Account</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Are you sure? This will delete all your account information including
+            your snakes and games.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

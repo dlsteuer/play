@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load basic %}
+
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block outside_content %}
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h1 class="text-center w-auto m-b-50">
+        {{ bracket.tournament.name }} > {{ bracket.name }} > Round {{ bracket.latest_round.number }}
+      </h1>
+    </div>
+  </div>
+  <div class="row">
+    {% for heat in bracket.latest_round.heats %}
+    <div class="col-3 m-b-10">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-primary">
+          <p class="text-center font-size-26 m-b-0 f-w-500" style="color: white;">
+            Group {{ heat.number }}
+          </p>
+        </li>
+        {% for snake_heat in heat.ordered_snakes %}
+        <li class="list-group-item font-size-22">
+          {% if snake_heat.first %}<span class="badge badge-accent font-size-24">&nbsp;<strong>1</strong>&nbsp;</span>{% endif %}
+          {% if snake_heat.second %}<span class="badge badge-success font-size-24">&nbsp;<strong>2</strong>&nbsp;</span>{% endif %}
+          {% if snake_heat.third %}<span class="badge badge-info font-size-24">&nbsp;<strong>3</strong>&nbsp;</span>{% endif %}
+          {{ snake_names|get_item:snake_heat.snake.id }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

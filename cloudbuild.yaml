@@ -1,0 +1,22 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    docker pull gcr.io/$PROJECT_ID/play:latest || exit 0
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-t', 'gcr.io/$PROJECT_ID/play:$SHORT_SHA',
+    '-t', 'gcr.io/$PROJECT_ID/play:latest',
+    '--cache-from', 'gcr.io/$PROJECT_ID/play:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', '-e', 'ENV=local', 'gcr.io/$PROJECT_ID/play:$SHORT_SHA', 'pytest']
+- name: 'dlsteuer/black'
+  args: ['--check', '.']
+- name: 'alpine/flake8'
+  args: ['.']
+images: ['gcr.io/$PROJECT_ID/play:latest']

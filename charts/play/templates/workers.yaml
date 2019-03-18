@@ -1,0 +1,45 @@
+{{ range $idx, $cmd := .Values.workers -}}
+{{ $name := $cmd | replace "_" "-" -}}
+{{ $fullName := printf "play-worker-%s" $name -}}
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  namespace: default
+  labels:
+    app: {{ $fullName }}
+spec:
+  # All existing Pods are killed before new ones are created with this strategy.
+  # this limits the possiblity that multiple workers of the same type are
+  # running.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ $fullName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName }}
+    spec:
+      containers:
+      - name: {{ $fullName }}
+        image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
+        command:
+          - /app/manage.py
+        args:
+          - {{ $cmd }}
+        env:
+{{- include "env" $ | nindent 10 }}
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: 500M
+          requests:
+            cpu: "0.5"
+            memory: 500M
+{{ end -}}

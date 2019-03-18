@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load basic %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ tournament.name }}</h1>
+  <ul class="nav nav-tabs" id="brackets" role="tablist">
+    {% for bracket in tournament.brackets %}
+     <li class="nav-item">
+        <a class="nav-link{% if forloop.last %} show active{% endif %}" id="bracket-{{ bracket.id }}-tab" data-toggle="tab" href="#bracket-{{ bracket.id }}" role="tab" aria-controls="home" aria-selected="true">{{ bracket.name }}</a>
+     </li>
+    {% endfor %}
+  </ul>
+
+  <div class="tab-content container">
+    {% for bracket in tournament.brackets %}
+
+    {% if bracket.winners %}
+      {% include "tournament_bracket/_winners_pane.html" with tournament_bracket=bracket %}
+    {% endif %}
+
+    <div class="tab-pane fade{% if forloop.last %} show active{% endif %}" id="bracket-{{ bracket.id }}" role="tabpanel" aria-labelledby="home-tab">
+
+      <!-- rounds tabs -->
+      <ul class="nav nav-tabs" id="bracket-{{bracket.id}}-rounds" role="tablist">
+        {% for round in bracket.rounds %}
+         <li class="nav-item">
+            <a class="nav-link{% if forloop.last %} show active{% endif %}" id="round-{{ round.id }}-tab" data-toggle="tab" href="#round-{{ round.id }}" role="tab">Round {{ round.number }}</a>
+         </li>
+        {% endfor %}
+      </ul>
+
+      <!-- rounds tab content -->
+      <div class="tab-content container ">
+        {% for round in bracket.rounds %}
+        <div class="tab-pane fade{% if forloop.last %} show active{% endif %}" id="round-{{ round.id }}" role="tabpanel">
+
+
+          <!-- heat tabs-->
+          <ul class="nav nav-tabs" id="bracket-{{bracket.id}}-round-{{round.id}}-heats" role="tablist">
+            {% for heat in round.heats %}
+            <li class="nav-item">
+              <a class="nav-link {% if forloop.last %} show active{% endif %}" id="heat-{{ heat.id }}-tab" data-toggle="tab" href="#heat-{{ heat.id }}" role="tab">
+                Heat {{ heat.number }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <!-- heat tab content -->
+          <div class="tab-content container">
+              {% for heat in round.heats %}
+              <div class="tab-pane fade {% if forloop.last %} show active{% endif %}" id="heat-{{ heat.id }}" role="tabpanel">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="nav flex-column nav-pills" id="v-{{heat.id}}-pills-tab" role="tablist" aria-orientation="vertical">
+                          {% for snake_heat in heat.snakes %}
+                          <a class="nav-link{% if forloop.first %} active{% endif %}" id="{{heat.id}}-{{snake_heat.id}}-tab" data-toggle="pill" href="#{{heat.id}}-{{snake_heat.id}}-panel" role="tab">
+                            {{ snake_names|get_item:snake_heat.snake.id }}
+                          </a>
+                          {% endfor %}
+                        </div>
+                      </div>
+                      <div class="col-9">
+                        <div class="tab-content" id="tabContent">
+                          {% for snake_heat in heat.snakes %}
+                          <div class="tab-pane fade {% if forloop.first %} show active{% endif %}" id="{{heat.id}}-{{snake_heat.id}}-panel" role="tabpanel">
+                            {{ snake_descriptions|get_item:snake_heat.snake.id | linebreaks }}
+                          </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+
+        </div>
+        {% endfor %}
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

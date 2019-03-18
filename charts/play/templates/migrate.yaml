@@ -1,0 +1,28 @@
+{{ if .Values.autoMigrate -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: play-migrate
+  namespace: default
+  labels:
+    app: play-migrate
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "0"
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: play-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: play-migrate
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        command: ["/app/manage.py"]
+        args: ["migrate"]
+        env:
+{{- include "env" . | nindent 10 }}
+{{ end -}}

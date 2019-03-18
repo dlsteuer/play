@@ -1,0 +1,15 @@
+{% load widget_tweaks %}
+
+<div class="form-group">
+  <div class="custom-control custom-checkbox form-check">
+    {% render_field field class="form-control custom-control-input" %}
+    {% if label %}
+    <label class="custom-control-label" for="id_{{ field.name }}">{{ label }}</label>
+    {% endif %}
+    {% for error in field.errors %}
+    <div class="text-danger">
+      <small>{{ error }}</small>
+    </div>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="row">
+		<div class="offset-md-1 col-md-10">
+			<header class="page-header">
+				<h1>FAQ</h1>
+			</header>
+		</div>
+	</div>
+	<div class="row">
+		<div class="offset-md-1 col-md-10">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0 text-primary">
+						What am I doing here?
+					</h5>
+				</div>
+				<div class="card-body">
+					You're here to learn about Battlesnake! A fun way to practice programming and compete with other developers to be the last snake slithering.
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0 text-primary">
+						Do I need to know how to program?
+					</h5>
+				</div>
+				<div class="card-body">
+					A little knowledge about your programming language of choice will help you along the way. We're working on great content to help folks new to programming, but in the meantime check out our <a href="{% url 'docs' %}">docs here</a> to find out more about how to create and deploy a snake and join the <a href="{% url 'slack' %}">Battlesnake Slack</a> to chat with other Battlesnake developers.
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0 text-primary">
+						Is this machine learning?
+					</h5>
+				</div>
+				<div class="card-body">
+					Machine learning is a great way to train your snake but you can certainly have success in games with hand coded snake logic. The majority of the top competitive snakes are currently all hand coded! If you're curious about using Machine Learning you can also join the #ml-snake-development channel on the <a href="{% url 'slack' %}">Battlesnake Slack</a>.
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0 text-primary">
+						What is the Battlesnake Tournament?
+					</h5>
+				</div>
+				<div class="card-body">
+					The Battlesnake Tournament is a one day event where programmers of all skill levels come together to create snake bots and compete for prizes. The Tournament is currently hosted annually in Victoria BC Canada. <a href="{% url 'events' %}">Learn more about the Battlesnake Tournament here.</a>
+				</div>
+			</div>			
+		</div>
+	</div>
+{% endblock %}

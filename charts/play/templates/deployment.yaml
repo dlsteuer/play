@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: play
+  namespace: default
+  labels:
+    app: play
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: play
+  template:
+    metadata:
+      labels:
+        app: play
+    spec:
+      containers:
+      - name: play
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        env:
+{{- include "env" . | nindent 10 }}
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /healthz/alive
+            port: 8000
+          initialDelaySeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8000
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 1000M
+          requests:
+            cpu: "0.5"
+            memory: 500M
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                    - play
+              topologyKey: "kubernetes.io/hostname"

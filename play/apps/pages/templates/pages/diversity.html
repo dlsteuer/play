@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="offset-md-1 col-md-10">
+        <header class="page-header">
+            <h1>Diversity</h1>
+        </header>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text">
+                    Our goal is to create an inclusive, respectful environment that welcomes participation from people
+                    of all races, ethnicities, genders, ages, abilities, religions, and sexual orientations. The
+                    Battlesnake community is based on mutual respect, tolerance, and encouragement, and we are working
+                    to help each other live up to these principles. We want our community to be more diverse: whoever
+                    you are, and whatever your background, we welcome you.
+                </p>
+                <p class="card-text">
+                    We're actively seeking to increase the diversity of our users, event attendees, and sponsors. This
+                    is and will continue to be an ongoing process.
+                </p>
+                <p class="card-text lead">
+                    Ways you can help us build a more diverse community:
+                </p>
+                <ul>
+                    <li>Share Battlesnake with your community, with the message that we welcome all people
+                        to join us.</li>
+                    <li>Use inclusive language including gender-neutral pronouns, people-first language,
+                        and avoid terms based in systems of discrimination (racism, sexism, and ableism). </li>
+                    <li>Organize Battlesnake meetups and events for your communities and let us know -
+                        we want to help!</li>
+                    <li>Report all breaches of our <a href="{% url 'conduct' %}">Code of Conduct</a> to us via
+                        <a href="us@battlesnake.io">email</a>,
+                        <a
+                            href="https://join.slack.com/t/battlesnake/shared_invite/enQtMzQ1MjIyNDAzNzgxLTJkYTQyZGM5NTYyMjI3MGZkN2U4ZTEyMGFhYjM2MzQ3NzEyOTM1N2ZhZjgwMGFlZDM0YWNiZmRhMmVkMDZkOGE">
+                            Slack</a>,
+                        or in person to any Battlesnake volunteer.</li>
+                    <li><a href="us@battlesnake.io">Suggest</a> ways that Battlesnake can be more
+                        welcoming, supportive, and free from intimidation and marginalization to you and your
+                        communities.</li>
+                </ul>
+                <p class="card-text">
+                    <i>Credit for the original version of this statement goes to
+                        <a href="http://assets.en.oreilly.com/1/eventprovider/1/ConfDiversity.pdf">O'Reilly Media</a>.
+                        <br>
+                        Thank you to <a href="https://us.pycon.org/2019/about/diversity/">Pycon</a> for helping us to
+                        strengthen our message about the importance of
+                        diversity.</i>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

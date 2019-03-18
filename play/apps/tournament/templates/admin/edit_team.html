@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header">
+            Team Admin
+        </div>
+        <div class="card-body">
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+            <form method="post" novalidate action="">
+                {% csrf_token %}
+                {% include '_field.html' with field=form.name %}
+                {% include '_field.html' with field=form.description %}
+                {{ form.users }}
+
+                <div class="form-group">
+                    <label>Add user:</label>
+                    <div class="row">
+                        <div class="col">
+                            <select id="add-user" type="text" placeholder="type to search for users..." class="form-control" autocomplete="off" data-url="/tournament/admin/users/"></select>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="add-user-button" type="button" class="btn btn-sm btn-primary">Add</button>
+                        </div>
+                    </div>
+                </div>
+                <label>
+                    <label for="user-table">Users:</label>
+                </label>
+                <table id="user-table" class="table table-striped"></table>
+                <div class="row">
+                    <div class="col">
+                        {{ form.snakes }}
+                        <div class="form-group">
+                            <label>
+                                <label for="id_snakes_select">Snakes:</label>
+                            </label>
+                            <select autocomplete="off" class="form-control" id="id_snakes_select"></select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        {% include '_field.html' with field=form.tournament %}
+                    </div>
+                </div>
+                {% include '_field.html' with field=form.status %}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js_dom_ready %}
+
+    $("#add-user").autoComplete()
+    $("#add-user").keypress(function(e) {
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if(code == 13) { //Enter keycode
+            return false;
+        }
+    })
+    $("#add-user-button").on('click', function() {
+        var userId = $("#add-user").next().next().val()
+        var usersField = $("#id_users")
+        var current = usersField.val()
+        if ((current || "").includes(userId)) {
+            $("#add-user").val("").next().next().val("")
+            return
+        }
+        if (!current) {
+            usersField.val(userId)
+        } else {
+            usersField.val(current + "," + userId)
+        }
+        updateUsersTable()
+        $("#add-user").val("").next().next().val("")
+        updateSnakesSelect()
+    })
+
+    function updateSnakesSelect() {
+        $("#id_snakes_select option").remove();
+        var users = $("#id_users").val()
+        $.ajax({
+            url: "/tournament/admin/users/snakes/?users=" + users,
+        }).done(function(data) {
+            $.each(data, function(index, item) {
+                selected = false
+                if (index == 0 || item.value == $("#id_snakes").val()) {
+                    selected = true
+                }
+
+                opt = new Option(item.text, item.value, selected, selected)
+                $("#id_snakes_select").append(opt);
+            })
+
+            updateSnakeStatus()
+        })
+    }
+
+    function updateUsersTable() {
+        var users = $("#id_users").val()
+        table = $("#user-table")
+        table.empty()
+        $.ajax({
+            url: "/tournament/admin/users/info/?users=" + users,
+        }).done(function(data) {
+            s = []
+            if (users.length > 0) {
+                s = users.split(",")
+            }
+
+            $.each(s, function(_, userId) {
+                $.each(data, function(_, item) {
+                    if (item.value != userId) {
+                        return
+                    }
+                    table.append('<tr><td>' + item.text + '</td><td class="text-right"><button type="button" class="btn btn-danger btn-sm remove-user" data-user-id=' + item.value + '>Remove</button></td></tr>')
+                })
+            })
+        })
+    }
+
+    $("body").on("click", ".remove-user", function() {
+        userId = $(this).data("user-id")
+        userIds = $("#id_users").val().split(",")
+        newIds = []
+        $.each(userIds, function(i, item) {
+            if (item != userId) {
+                newIds.push(item)
+            }
+        })
+        $("#id_users").val(newIds.join(','))
+        updateUsersTable()
+    })
+
+    $("#id_snakes_select").on("change", function() {
+        updateSnakeStatus()
+    })
+
+    function updateSnakeStatus() {
+        var snakeId = $("#id_snakes_select").val()
+        if (!snakeId) {
+            return
+        }
+        $("#id_snakes").val(snakeId)
+        $.ajax({
+            url: "/tournament/admin/users/snakes/status/" + snakeId + "/"
+        }).done(function(data) {
+            $("#id_status").val(JSON.stringify(data, null, 4))
+        })
+    }
+
+    updateUsersTable()
+    updateSnakesSelect()
+    updateSnakeStatus()
+
+{% endblock %}

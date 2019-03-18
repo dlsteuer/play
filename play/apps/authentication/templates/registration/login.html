@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block nav %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="sign-in-form">
+  <div class="card">
+    <div class="card-body">
+      <a href="{% url 'home' %}" class="brand text-center d-block m-b-20">
+        {% include 'battlesnake-logo.html' %}
+      </a>
+      <h5 class="sign-in-heading text-center m-b-20">
+        Welcome to Battlesnake
+      </h5>
+      <a href="{% url 'social:begin' 'github' %}?next={{ request.GET.next }}"
+        class="btn btn-accent btn-rounded btn-floating btn-lg btn-block">
+        Sign in with GitHub
+      </a>
+      <p class="text-center text-muted small m-t-25 m-b-0 p-0">
+        Signing in signifies that you have read and agree to the
+        <a href="{% url 'terms' %}">Terms of Service</a> and
+        <a href="{% url 'privacy' %}">Privacy Policy</a>.
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

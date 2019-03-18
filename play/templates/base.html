@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <title>Battlesnake</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bringing developers of all skill levels together in a friendly, co-operative environment. Our goal is to provide educational resources to developers and grow the tech community through collaboration and competition.">
+
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" />
+
+  <meta property="og:title" content="Battlesnake">
+  <meta property="og:description" content="Bringing developers of all skill levels together in a friendly, co-operative environment. Our goal is to provide educational resources to developers and grow the tech community through collaboration and competition.">
+  {% if game_image %}
+    <meta property="og:image" content="{{ game_image }}">
+  {% else %}
+    <meta property="og:image" content="{% static 'img/social-banner.png' %}">
+  {% endif %}
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+  <meta name="twitter:title" content="Battlesnake">
+  <meta name="twitter:description" content="Bringing developers of all skill levels together in a friendly, co-operative environment. Our goal is to provide educational resources to developers and grow the tech community through collaboration and competition.">
+  {% if game_image %}
+    <meta name="twitter:image" content="{{ game_image }}">
+  {% else %}
+    <meta name="twitter:image" content="{% static 'img/social-banner.png' %}">
+  {% endif %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@battlesnakeio">
+
+  <meta name='theme-color' content='#F64A91'>
+
+  {% include 'theme/styles.html' %}
+  {% include 'styles.html' %}
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-36561803-13"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-36561803-13');
+  </script>
+</head>
+<body class="layout-horizontal menu-auto-hide">
+  {% block nav %}
+  {% include 'nav.html' %}
+  {% endblock nav %}
+
+  <div class="content-wrapper">
+    <main class="content container">
+      {% for message in messages %}
+      <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true" class="la la-close"></span>
+        </button>
+        {{ message }}
+      </div>
+      {% endfor %}
+
+      <section class="page-content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+
+  {% block outside_content %}{% endblock %}
+
+  {% block footer %}
+  {% include 'footer.html' %}
+  {% endblock footer %}
+
+  {% include 'theme/scripts.html' %}
+  {% include 'scripts.html' %}
+
+  <!-- Page Specific JS -->
+  <script>
+    domready(function () {
+      {% block js_dom_ready %} {% endblock %}
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <div class="form-group">
+            <label>Find Team</label>
+            <div class="row">
+                <div class="col">
+                    <select id="find-team" type="text" placeholder="type to search for teams..." class="form-control" autocomplete="off" data-url="/tournament/admin/teams/"></select>
+                </div>
+                <div class="col-md-2">
+                    <button id="edit-team-button" type="button" class="btn btn-sm btn-primary">
+                        Edit
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a href="{% url 'new_tournament_admin_team' %}">New Team</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js_dom_ready %}
+$("#find-team").autoComplete()
+$("#find-team").keypress(function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code == 13) { //Enter keycode
+        return false;
+    }
+})
+
+$("#edit-team-button").on('click', function() {
+    var teamId = $("#find-team").next().next().val()
+    window.location = "/tournament/admin/teams/" + teamId + "/"
+})
+{% endblock %}
