@@ -62,7 +62,7 @@ class Game(BaseModel):
             "height": self.height,
             "maxTurnsToNextFoodSpawn": self.max_turns_to_next_food_spawn,
             "food": self.snakes.count(),
-            "snakeTimeout": 500,
+            "snakeTimeout": 250,
             "snakes": [
                 {
                     "name": gs.name if len(gs.name) > 0 else gs.snake.public_name,
