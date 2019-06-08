@@ -1,5 +1,6 @@
 language: python
 before_script:
+  - echo $GCLOUD_SERVICE_KEY
   - docker login -u _json_key -p "`echo $GCLOUD_SERVICE_KEY | base64 --decode`" https://gcr.io
 jobs:
   include:
