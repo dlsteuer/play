@@ -1,6 +1,6 @@
 language: python
 before_script:
-  - echo $GCLOUD_SERVICE_KEY | base64 -D > service_account.json
+  - echo $GCLOUD_SERVICE_KEY | base64 --decode > service_account.json
   - cat service_account.json | docker login -u _json_key --password-stdin https://gcr.io
 jobs:
   include:
