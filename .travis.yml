@@ -5,6 +5,6 @@ jobs:
       script:
         - docker pull battlesnakeio/play:latest
         - docker build -t battlesnakeio/play:$TRAVIS_PULL_REQUEST_SHA --cache-from battlesnakeio/play:latest .
-        - docker run -e ENV=local battlesnakeio/plau:$TRAVIS_PULL_REQUEST_SHA pytest
+        - docker run -e ENV=local battlesnakeio/play:$TRAVIS_PULL_REQUEST_SHA pytest
         - docker run dlsteuer/black --check .
         - docker run alpine/flake8 .
