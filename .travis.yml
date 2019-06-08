@@ -1,7 +1,6 @@
 language: python
 env:
-  - ENV=local
-  - DJANGO_SETTINGS_MODULE=settings.base
+  - ENV=local DJANGO_SETTINGS_MODULE=settings.base
 jobs:
   include:
     - stage: test
