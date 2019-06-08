@@ -1,0 +1,11 @@
+language: python
+jobs:
+  include:
+    - stage: test
+      script:
+        - docker pull gcr.io/battlesnake-io/play:latest
+        - docker build -t gcr.io/battlesnake-io/play:$TRAVIS_PULL_REQUEST_SHA -t gcr.io/battlesnake-io/play:latest --cache-from gcr.io/battlesnake-io/play:latest
+        - docker run -e ENV=local gcr.io/battlesnake-io/play:$TRAVIS_PULL_REQUEST_SHA pytest
+        - docker run dlsteuer/black --check .
+        - docker run alpine/flake8 .
+        - docker push gcr.io/battlesnake-io/play:latest
