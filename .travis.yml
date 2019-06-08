@@ -1,13 +1,10 @@
 language: python
-env:
-  - ENV=local DJANGO_SETTINGS_MODULE=settings.base
 jobs:
   include:
     - stage: test
       script:
         - docker pull battlesnakeio/play:latest
         - docker build -t battlesnakeio/play:$TRAVIS_PULL_REQUEST_SHA --cache-from battlesnakeio/play:latest .
-        - cd play
-        - pytest
+        - docker run -e ENV=local battlesnakeio/plau:$TRAVIS_PULL_REQUEST_SHA pytest
         - docker run dlsteuer/black --check .
         - docker run alpine/flake8 .
